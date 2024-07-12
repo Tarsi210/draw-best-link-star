@@ -6,8 +6,8 @@
 // @namespace      https://www.nathanpralle.com
 // @author		   Tarsi210
 // @description    Build the best link star in an area.
-// @updateURL	   http://www.nathanpralle.com/iitc-plugin-best-link-star.meta.js
-// @downloadURL	   http://www.nathanpralle.com/iitc-plugin-best-link-star.user.js
+// @updateURL	   https://raw.githubusercontent.com/Tarsi210/draw-best-link-star/main/iitc-plugin-best-link-star.user.js
+// @downloadURL	   https://raw.githubusercontent.com/Tarsi210/draw-best-link-star/main/iitc-plugin-best-link-star.user.js
 // @include        https://intel.ingress.com/*
 // @match          https://intel.ingress.com/*
 // @depends		   draw-tools
