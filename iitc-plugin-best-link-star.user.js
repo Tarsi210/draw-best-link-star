@@ -4,13 +4,13 @@
 // @category       Info
 // @version        0.0.8
 // @namespace      https://www.nathanpralle.com
-// @author		   Tarsi210
+// @author         Tarsi210
 // @description    Build the best link star in an area.
 // @updateURL	   https://raw.githubusercontent.com/Tarsi210/draw-best-link-star/main/iitc-plugin-best-link-star.user.js
 // @downloadURL	   https://raw.githubusercontent.com/Tarsi210/draw-best-link-star/main/iitc-plugin-best-link-star.user.js
 // @include        https://intel.ingress.com/*
 // @match          https://intel.ingress.com/*
-// @depends		   draw-tools
+// @depends        draw-tools
 // @grant          none
 // ==/UserScript==
 
@@ -223,33 +223,73 @@ function wrapper(plugin_info) {
         return (ccw(p1, q1, q2) !== ccw(p2, q1, q2)) && (ccw(p1, p2, q1) !== ccw(p1, p2, q2));
     }
 
-    function isLinkCrossingAnyExistingLinks(link) {
-        const existingLinks = window.links;
-        for (const guid in existingLinks) {
-            const existingLink = existingLinks[guid];
-            const latLngs = existingLink.getLatLngs();
-            const existingLine = [latLngs[0], latLngs[1]];
+	function pointsAreEqual(p1, p2) {
+	    return p1.lat === p2.lat && p1.lng === p2.lng;
+	}
+	
+	function isLinkCrossingAnyExistingLinks(link) {
+	    const existingLinks = window.links;
+	    for (const guid in existingLinks) {
+	        const existingLink = existingLinks[guid];
+	        const latLngs = existingLink.getLatLngs();
+	        const existingLine = [latLngs[0], latLngs[1]];
 
-            if (doLinesIntersect(link, existingLine)) {
-                return true;
-            }
-        }
-        return false;
-    }
+			// Check if both endpoints match (in any order)
+	        const bothEndpointsMatch =
+	            (pointsAreEqual(link[0], existingLine[0]) && pointsAreEqual(link[1], existingLine[1])) ||
+	            (pointsAreEqual(link[0], existingLine[1]) && pointsAreEqual(link[1], existingLine[0]));
+	        if (bothEndpointsMatch) {
+	            return true;
+	        }
+	
+	        // Skip if any endpoints are shared
+	        if (
+	            pointsAreEqual(link[0], existingLine[0]) ||
+	            pointsAreEqual(link[0], existingLine[1]) ||
+	            pointsAreEqual(link[1], existingLine[0]) ||
+	            pointsAreEqual(link[1], existingLine[1])
+	        ) {
+	            continue;
+	        }
+	
+	        if (doLinesIntersect(link, existingLine)) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 
-    function isPossibleLinkCrossingAnyExistingLinks(portalALatLngs,portalBLatLngs) {
-        const existingLinks = window.links;
-        for (const guid in existingLinks) {
-            const existingLink = existingLinks[guid];
-            const latLngs = existingLink.getLatLngs();
-            const existingLine = [latLngs[0],latLngs[1]];
+	function isPossibleLinkCrossingAnyExistingLinks(portalALatLngs, portalBLatLngs) {
+	    const existingLinks = window.links;
+	    for (const guid in existingLinks) {
+	        const existingLink = existingLinks[guid];
+	        const latLngs = existingLink.getLatLngs();
+	        const existingLine = [latLngs[0], latLngs[1]];
 
-            if (doLinesIntersect([portalALatLngs,portalBLatLngs], existingLine)) {
-                return true;
-            }
-        }
-        return false;
-    }
+			// Check if both endpoints match (in any order)
+	        const bothEndpointsMatch =
+	            (pointsAreEqual(portalALatLngs, existingLine[0]) && pointsAreEqual(portalBLatLngs, existingLine[1])) ||
+	            (pointsAreEqual(portalALatLngs, existingLine[1]) && pointsAreEqual(portalBLatLngs, existingLine[0]));
+	        if (bothEndpointsMatch) {
+	            return true;
+	        }
+	
+	        // Skip if any endpoints are shared
+	        if (
+	            pointsAreEqual(portalALatLngs, existingLine[0]) ||
+	            pointsAreEqual(portalALatLngs, existingLine[1]) ||
+	            pointsAreEqual(portalBLatLngs, existingLine[0]) ||
+	            pointsAreEqual(portalBLatLngs, existingLine[1])
+	        ) {
+	            continue;
+	        }
+	
+	        if (doLinesIntersect([portalALatLngs, portalBLatLngs], existingLine)) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 
 
 	function generateCSV(portals,path,bestPortal,distanceMatrix) {
